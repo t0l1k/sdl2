@@ -3,6 +3,8 @@ package sdl2
 import (
 	"fmt"
 
+	"github.com/t0l1k/sdl2/clock"
+
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
 )
@@ -13,6 +15,8 @@ type Sprite interface {
 	Event(sdl.Event)
 	Destroy()
 }
+
+type GetTime func() (int, int, int, int)
 
 type Screen struct {
 	title                  string
@@ -26,6 +30,9 @@ type Screen struct {
 	sprites                []Sprite
 	font                   *ttf.Font
 	menuLine               *MenuLine
+	statusLine             *StatusLine
+	analogClock            *AnalogClock
+	fnAnalog               GetTime
 }
 
 func NewScreen(title string, window *sdl.Window, renderer *sdl.Renderer, width, height int32) *Screen {
@@ -38,6 +45,7 @@ func NewScreen(title string, window *sdl.Window, renderer *sdl.Renderer, width, 
 		bg:       sdl.Color{192, 192, 192, 0},
 		fg:       sdl.Color{0, 0, 0, 255},
 		lineBg:   sdl.Color{128, 128, 128, 0},
+		fnAnalog: clock.Get,
 	}
 }
 
@@ -58,7 +66,31 @@ func (s *Screen) setup() {
 		s.font,
 		func() { s.quit() })
 	s.sprites = append(s.sprites, s.menuLine)
+	s.statusLine = NewStatusLine(
+		sdl.Rect{0, s.height - lineHeight, s.width, lineHeight},
+		s.fg,
+		s.lineBg,
+		s.renderer,
+		s.font, s.selectClock)
+	s.sprites = append(s.sprites, s.statusLine)
+	s.analogClock = NewAnalogClock(
+		s.renderer,
+		sdl.Rect{0, lineHeight, s.width, s.height - lineHeight*2},
+		s.fg,
+		sdl.Color{255, 0, 0, 255},
+		s.bg,
+		s.bg,
+		s.font,
+		s.fnAnalog)
+	s.sprites = append(s.sprites, s.analogClock)
+}
 
+func (s *Screen) selectClock() {
+	s.fnAnalog = clock.Get
+	s.title = "Clock"
+	s.Destroy()
+	s.setup()
+	s.analogClock.SetShow(true)
 }
 
 func (s *Screen) setMode() {
@@ -169,6 +201,7 @@ func (s *Screen) Destroy() {
 		sprite.Destroy()
 	}
 	s.sprites = s.sprites[:0]
+	s.font.Close()
 }
 
 func (s *Screen) quit() {
