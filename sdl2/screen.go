@@ -4,20 +4,13 @@ import (
 	"fmt"
 
 	"github.com/t0l1k/sdl2/clock"
+	"github.com/t0l1k/sdl2/fifteen"
 	"github.com/t0l1k/sdl2/life"
+	"github.com/t0l1k/sdl2/sdl2/ui"
 
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
 )
-
-type Sprite interface {
-	Render(*sdl.Renderer)
-	Update()
-	Event(sdl.Event)
-	Destroy()
-}
-
-type GetTime func() (int, int, int, int)
 
 type Screen struct {
 	title                  string
@@ -28,13 +21,14 @@ type Screen struct {
 	running                bool
 	bg, fg, lineBg         sdl.Color
 	fpsCountTime, fpsCount uint32
-	sprites                []Sprite
+	sprites                []ui.Sprite
 	font                   *ttf.Font
 	menuLine               *MenuLine
 	statusLine             *StatusLine
-	analogClock            *AnalogClock
+	analogClock            *clock.AnalogClock
 	life                   *life.Life
-	fnAnalog               GetTime
+	fifteen                *fifteen.Game
+	fnAnalog               clock.GetTime
 }
 
 func NewScreen(title string, window *sdl.Window, renderer *sdl.Renderer, width, height int32) *Screen {
@@ -75,9 +69,10 @@ func (s *Screen) setup() {
 		s.renderer,
 		s.font,
 		s.selectClock,
-		s.selectLife)
+		s.selectLife,
+		s.selectFifteen)
 	s.sprites = append(s.sprites, s.statusLine)
-	s.analogClock = NewAnalogClock(
+	s.analogClock = clock.NewAnalogClock(
 		s.renderer,
 		sdl.Rect{0, lineHeight, s.width, s.height - lineHeight*2},
 		s.fg,
@@ -88,6 +83,18 @@ func (s *Screen) setup() {
 	s.sprites = append(s.sprites, s.analogClock)
 	s.life = life.NewLife(128, 250, s.renderer, sdl.Rect{0, lineHeight, s.width, s.height - lineHeight*2}, s.fg, s.bg)
 	s.sprites = append(s.sprites, s.life)
+	s.fifteen = fifteen.NewGame(s.renderer, sdl.Rect{0, lineHeight, s.width, s.height - lineHeight*2})
+	s.fifteen.Setup()
+	s.sprites = append(s.sprites, s.fifteen)
+}
+
+func (s *Screen) selectFifteen() {
+	s.title = "Game Fifteen"
+	s.Destroy()
+	s.setup()
+	s.analogClock.SetShow(false)
+	s.life.SetShow(false)
+	s.fifteen.SetShow(true)
 }
 
 func (s *Screen) selectLife() {
@@ -95,6 +102,7 @@ func (s *Screen) selectLife() {
 	s.Destroy()
 	s.setup()
 	s.analogClock.SetShow(false)
+	s.fifteen.SetShow(false)
 	s.life.SetShow(true)
 }
 
@@ -104,6 +112,7 @@ func (s *Screen) selectClock() {
 	s.Destroy()
 	s.setup()
 	s.life.SetShow(false)
+	s.fifteen.SetShow(false)
 	s.analogClock.SetShow(true)
 }
 
