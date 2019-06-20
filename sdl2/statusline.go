@@ -9,19 +9,19 @@ type StatusLine struct {
 	rect    sdl.Rect
 	fg, bg  sdl.Color
 	sprites []Sprite
-	fnClock func()
 }
 
-func NewStatusLine(rect sdl.Rect, fg, bg sdl.Color, renderer *sdl.Renderer, font *ttf.Font, fnClock func()) *StatusLine {
+func NewStatusLine(rect sdl.Rect, fg, bg sdl.Color, renderer *sdl.Renderer, font *ttf.Font, fnClock, fnLife func()) *StatusLine {
 	var sprites []Sprite
 	btnClock := NewButton(renderer, "Clock", sdl.Rect{rect.X, rect.Y, rect.H * 4, rect.H}, fg, bg, font, fnClock)
 	sprites = append(sprites, btnClock)
+	btnLife := NewButton(renderer, "Conway's Life", sdl.Rect{rect.X + rect.H*4, rect.Y, rect.H * 5, rect.H}, fg, bg, font, fnLife)
+	sprites = append(sprites, btnLife)
 	return &StatusLine{
 		rect:    rect,
 		fg:      fg,
 		bg:      bg,
 		sprites: sprites,
-		fnClock: fnClock,
 	}
 }
 

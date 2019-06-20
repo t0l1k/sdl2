@@ -4,7 +4,6 @@ import (
 	"math"
 
 	"github.com/veandco/go-sdl2/sdl"
-	"github.com/veandco/go-sdl2/ttf"
 )
 
 type AnalogClock struct {
@@ -12,7 +11,6 @@ type AnalogClock struct {
 	rect                                       sdl.Rect
 	texFace                                    *sdl.Texture
 	fg, bg, secHandColor, tweentyPointColor    sdl.Color
-	font                                       *ttf.Font
 	hourHand, minuteHand, secondHand, mSecHand *ClockHand
 	drawMsec                                   bool
 	tweentyBlinkTimer                          *BlinkTimer
@@ -21,7 +19,7 @@ type AnalogClock struct {
 	show                                       bool
 }
 
-func NewAnalogClock(renderer *sdl.Renderer, rect sdl.Rect, fg, secHandColor, tweentyPointColor, bg sdl.Color, font *ttf.Font, fnAnalog GetTime) *AnalogClock {
+func NewAnalogClock(renderer *sdl.Renderer, rect sdl.Rect, fg, secHandColor, tweentyPointColor, bg sdl.Color, fnAnalog GetTime) *AnalogClock {
 	texFace := NewClockFace(renderer, rect, fg, bg)
 	rectWidth, rectHeight := int32(float64(rect.H)*0.470), int32(float64(rect.H)*0.02)
 	mSecHand := NewSmallHand(renderer, rect.W, rect.H, sdl.Rect{rect.X, rect.Y, int32(float64(rectWidth) * 1), rectHeight / 2}, sdl.Point{int32(float64(rectHeight) * 0.2), rectHeight / 4}, secHandColor, bg)
@@ -35,7 +33,6 @@ func NewAnalogClock(renderer *sdl.Renderer, rect sdl.Rect, fg, secHandColor, twe
 		renderer:          renderer,
 		rect:              rect,
 		texFace:           texFace,
-		font:              font,
 		fg:                fg,
 		bg:                bg,
 		tweentyPointColor: tweentyPointColor,
@@ -47,6 +44,10 @@ func NewAnalogClock(renderer *sdl.Renderer, rect sdl.Rect, fg, secHandColor, twe
 		tipTweentyPoint:   tipTweentyPoint,
 		fnAnalog:          fnAnalog,
 	}
+}
+
+func (s *AnalogClock) GetShow() bool {
+	return s.show
 }
 
 func (s *AnalogClock) SetShow(show bool) {

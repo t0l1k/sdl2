@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/t0l1k/sdl2/clock"
+	"github.com/t0l1k/sdl2/life"
 
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
@@ -32,6 +33,7 @@ type Screen struct {
 	menuLine               *MenuLine
 	statusLine             *StatusLine
 	analogClock            *AnalogClock
+	life                   *life.Life
 	fnAnalog               GetTime
 }
 
@@ -71,7 +73,9 @@ func (s *Screen) setup() {
 		s.fg,
 		s.lineBg,
 		s.renderer,
-		s.font, s.selectClock)
+		s.font,
+		s.selectClock,
+		s.selectLife)
 	s.sprites = append(s.sprites, s.statusLine)
 	s.analogClock = NewAnalogClock(
 		s.renderer,
@@ -80,9 +84,18 @@ func (s *Screen) setup() {
 		sdl.Color{255, 0, 0, 255},
 		s.bg,
 		s.bg,
-		s.font,
 		s.fnAnalog)
 	s.sprites = append(s.sprites, s.analogClock)
+	s.life = life.NewLife(128, 250, s.renderer, sdl.Rect{0, lineHeight, s.width, s.height - lineHeight*2}, s.fg, s.bg)
+	s.sprites = append(s.sprites, s.life)
+}
+
+func (s *Screen) selectLife() {
+	s.title = "Conway's Life"
+	s.Destroy()
+	s.setup()
+	s.analogClock.SetShow(false)
+	s.life.SetShow(true)
 }
 
 func (s *Screen) selectClock() {
@@ -90,6 +103,7 @@ func (s *Screen) selectClock() {
 	s.title = "Clock"
 	s.Destroy()
 	s.setup()
+	s.life.SetShow(false)
 	s.analogClock.SetShow(true)
 }
 
@@ -129,14 +143,16 @@ func (s *Screen) Event() {
 			s.width, s.height = t.Data1, t.Data2
 			s.Destroy()
 			s.setup()
-			// fmt.Println("window resized", s.width, s.height)
+			fmt.Println("window resized", s.width, s.height)
 		case sdl.WINDOWEVENT_FOCUS_GAINED:
-			// fmt.Println("window focus gained", s.width, s.height)
+			fmt.Println("window focus gained", s.width, s.height)
 		case sdl.WINDOWEVENT_FOCUS_LOST:
-			// fmt.Println("window focus lost", s.width, s.height)
+			fmt.Println("window focus lost", s.width, s.height)
 		case sdl.WINDOW_MINIMIZED:
+			fmt.Println("window minimized", s.width, s.height)
 			s.Destroy()
 		case sdl.WINDOWEVENT_RESTORED:
+			fmt.Println("window restored", s.width, s.height)
 			s.setup()
 		}
 	}
