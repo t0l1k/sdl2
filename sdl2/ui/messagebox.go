@@ -78,7 +78,7 @@ func (s *MessageBox) GetTexture() *sdl.Texture {
 func (s *MessageBox) SetMessage(message string) {
 	s.texture.Destroy()
 	s.message = message
-	s.texture = newMessageBoxTexture(s.title, s.message, s.rect, s.fg, s.bg, s.renderer, s.font)
+	s.texture = newMessageBoxTexture(s.title, s.message, s.rect, s.fg, sdl.Color{0, 128, 0, 128}, s.renderer, s.font)
 	_, _, w, h, _ := s.texture.Query()
 	s.SetSize(w, h)
 }

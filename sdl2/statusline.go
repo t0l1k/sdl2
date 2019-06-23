@@ -12,7 +12,7 @@ type StatusLine struct {
 	sprites []ui.Sprite
 }
 
-func NewStatusLine(rect sdl.Rect, fg, bg sdl.Color, renderer *sdl.Renderer, font *ttf.Font, fnClock, fnLife, fnFifteen func()) *StatusLine {
+func NewStatusLine(rect sdl.Rect, fg, bg sdl.Color, renderer *sdl.Renderer, font *ttf.Font, fnClock, fnLife, fnFifteen, fnMines func()) *StatusLine {
 	var sprites []ui.Sprite
 	btnClock := ui.NewButton(renderer, "Clock", sdl.Rect{rect.X, rect.Y, rect.H * 4, rect.H}, fg, bg, font, fnClock)
 	sprites = append(sprites, btnClock)
@@ -20,6 +20,8 @@ func NewStatusLine(rect sdl.Rect, fg, bg sdl.Color, renderer *sdl.Renderer, font
 	sprites = append(sprites, btnLife)
 	btnFifteen := ui.NewButton(renderer, "Fifteen", sdl.Rect{rect.X + rect.H*9, rect.Y, rect.H * 4, rect.H}, fg, bg, font, fnFifteen)
 	sprites = append(sprites, btnFifteen)
+	btnMines := ui.NewButton(renderer, "Mines", sdl.Rect{rect.X + rect.H*13, rect.Y, rect.H * 4, rect.H}, fg, bg, font, fnMines)
+	sprites = append(sprites, btnMines)
 	return &StatusLine{
 		rect:    rect,
 		fg:      fg,

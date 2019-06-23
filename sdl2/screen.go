@@ -6,6 +6,7 @@ import (
 	"github.com/t0l1k/sdl2/clock"
 	"github.com/t0l1k/sdl2/fifteen"
 	"github.com/t0l1k/sdl2/life"
+	"github.com/t0l1k/sdl2/mines"
 	"github.com/t0l1k/sdl2/sdl2/ui"
 
 	"github.com/veandco/go-sdl2/sdl"
@@ -28,6 +29,7 @@ type Screen struct {
 	analogClock            *clock.AnalogClock
 	life                   *life.Life
 	fifteen                *fifteen.Game
+	mines                  *mines.MinesBoard
 	fnAnalog               clock.GetTime
 }
 
@@ -70,7 +72,8 @@ func (s *Screen) setup() {
 		s.font,
 		s.selectClock,
 		s.selectLife,
-		s.selectFifteen)
+		s.selectFifteen,
+		s.selectMines)
 	s.sprites = append(s.sprites, s.statusLine)
 	s.analogClock = clock.NewAnalogClock(
 		s.renderer,
@@ -86,6 +89,19 @@ func (s *Screen) setup() {
 	s.fifteen = fifteen.NewGame(s.renderer, sdl.Rect{0, lineHeight, s.width, s.height - lineHeight*2})
 	s.fifteen.Setup()
 	s.sprites = append(s.sprites, s.fifteen)
+	s.mines = mines.NewMinesBoard(8, 8, 12, s.renderer, sdl.Rect{0, lineHeight, s.width, s.height - lineHeight*2})
+	s.mines.Setup()
+	s.sprites = append(s.sprites, s.mines)
+}
+
+func (s *Screen) selectMines() {
+	s.title = "Game Minesweeper"
+	s.Destroy()
+	s.setup()
+	s.analogClock.SetShow(false)
+	s.life.SetShow(false)
+	s.fifteen.SetShow(false)
+	s.mines.SetShow(true)
 }
 
 func (s *Screen) selectFifteen() {
@@ -94,6 +110,7 @@ func (s *Screen) selectFifteen() {
 	s.setup()
 	s.analogClock.SetShow(false)
 	s.life.SetShow(false)
+	s.mines.SetShow(false)
 	s.fifteen.SetShow(true)
 }
 
@@ -103,6 +120,7 @@ func (s *Screen) selectLife() {
 	s.setup()
 	s.analogClock.SetShow(false)
 	s.fifteen.SetShow(false)
+	s.mines.SetShow(false)
 	s.life.SetShow(true)
 }
 
@@ -113,6 +131,7 @@ func (s *Screen) selectClock() {
 	s.setup()
 	s.life.SetShow(false)
 	s.fifteen.SetShow(false)
+	s.mines.SetShow(false)
 	s.analogClock.SetShow(true)
 }
 

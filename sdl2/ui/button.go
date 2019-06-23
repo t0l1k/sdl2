@@ -1,19 +1,21 @@
 package ui
 
 import (
+	"fmt"
+
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
 )
 
 type Button struct {
-	renderer                          *sdl.Renderer
-	texFocus, texNotFocus, texPressed *sdl.Texture
-	rect                              sdl.Rect
-	fg, bg                            sdl.Color
-	str                               string
-	font                              *ttf.Font
-	focus, pressed, show              bool
-	fn                                func()
+	renderer                                      *sdl.Renderer
+	texFocus, texNotFocus, texPressed             *sdl.Texture
+	rect                                          sdl.Rect
+	fg, bg                                        sdl.Color
+	str                                           string
+	font                                          *ttf.Font
+	focus, pressed, show, leftButton, rightButton bool
+	fn                                            func()
 }
 
 func NewButton(renderer *sdl.Renderer, str string, rect sdl.Rect, fg, bg sdl.Color, font *ttf.Font, fn func()) *Button {
@@ -53,8 +55,9 @@ func newButtonTexture(renderer *sdl.Renderer, str string, rect sdl.Rect, fg, bg 
 	renderer.SetDrawColor(fg.R, fg.G, fg.B, fg.A)
 	renderer.Copy(labelTexture, nil, &labelRect)
 	renderer.SetDrawColor(255, 0, 0, 255)
-	renderer.DrawRect(&sdl.Rect{2, 2, rect.W - 4, rect.H - 4})
+	renderer.DrawRect(&sdl.Rect{0, 0, rect.W, rect.H})
 	if pressed {
+		renderer.DrawRect(&sdl.Rect{2, 2, rect.W - 4, rect.H - 4})
 		renderer.DrawRect(&sdl.Rect{4, 4, rect.W - 8, rect.H - 8})
 	}
 	renderer.SetRenderTarget(nil)
@@ -105,8 +108,20 @@ func (s *Button) SetPos(pos sdl.Point) {
 	s.rect.Y = pos.Y
 }
 
+func (s *Button) GetFocus() bool {
+	return s.focus
+}
+
 func (s *Button) IsPressed() bool {
-	return s.pressed
+	return s.pressed && s.focus
+}
+
+func (s *Button) IsPressedLeft() bool {
+	return s.pressed && s.leftButton
+}
+
+func (s *Button) IsPressedRight() bool {
+	return s.pressed && s.rightButton
 }
 
 func (s *Button) Render(renderer *sdl.Renderer) {
@@ -136,11 +151,39 @@ func (s *Button) Update() {
 		} else {
 			s.focus = false
 		}
-		if s.focus && state > 0 {
-			s.pressed = true
-		} else if s.focus && state == 0 && s.pressed {
-			s.fn()
-			s.pressed = false
+		switch state {
+		case 0:
+			if !s.focus && s.pressed {
+				s.pressed = false
+				s.leftButton = false
+				s.rightButton = false
+			}
+			if s.focus && s.pressed {
+				s.fn()
+				s.pressed = false
+				s.leftButton = false
+				s.rightButton = false
+			}
+		case 1:
+			if s.focus {
+				s.pressed = true
+				s.leftButton = true
+			} else if !s.focus {
+				s.pressed = false
+				s.leftButton = false
+			}
+		case 2:
+			fmt.Println("pressed 2")
+		case 3:
+			fmt.Println("pressed 3")
+		case 4:
+			if s.focus {
+				s.pressed = true
+				s.rightButton = true
+			} else {
+				s.pressed = false
+				s.rightButton = false
+			}
 		}
 	}
 }
