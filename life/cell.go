@@ -1,43 +1,43 @@
 package life
 
-type CellStatus byte
+type cellStatus byte
 
 const (
-	blank CellStatus = iota
+	blank cellStatus = iota
 	alive
 	born
 	die
 )
 
-type Cell struct {
-	status CellStatus
+type cell struct {
+	status cellStatus
 }
 
-func NewCell() *Cell {
-	return &Cell{status: blank}
+func newCell() *cell {
+	return &cell{status: blank}
 }
 
-func (s *Cell) GetStatus() CellStatus {
+func (s *cell) getStatus() cellStatus {
 	return s.status
 }
 
-func (s *Cell) SetAlive() {
+func (s *cell) setAlive() {
 	s.status = alive
 }
 
-func (s *Cell) SetBlank() {
+func (s *cell) setBlank() {
 	s.status = blank
 }
 
-func (s *Cell) SetBorn() {
+func (s *cell) setBorn() {
 	s.status = born
 }
 
-func (s *Cell) SetDie() {
+func (s *cell) setDie() {
 	s.status = die
 }
 
-func (s Cell) String() string {
+func (s cell) String() string {
 	str := " "
 	switch s.status {
 	case alive:

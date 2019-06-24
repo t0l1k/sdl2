@@ -80,16 +80,24 @@ func (s *Screen) setup() {
 		sdl.Rect{0, lineHeight, s.width, s.height - lineHeight*2},
 		s.fg,
 		sdl.Color{255, 0, 0, 255},
-		s.bg,
-		s.bg,
+		s.bg, s.bg,
 		s.fnAnalog)
 	s.sprites = append(s.sprites, s.analogClock)
-	s.life = life.NewLife(128, 250, s.renderer, sdl.Rect{0, lineHeight, s.width, s.height - lineHeight*2}, s.fg, s.bg)
+	s.life = life.NewLife(
+		128, 255,
+		s.renderer,
+		sdl.Rect{0, lineHeight, s.width, s.height - lineHeight*2},
+		s.fg, s.bg)
 	s.sprites = append(s.sprites, s.life)
-	s.fifteen = fifteen.NewGame(s.renderer, sdl.Rect{0, lineHeight, s.width, s.height - lineHeight*2})
+	s.fifteen = fifteen.NewGame(
+		s.renderer,
+		sdl.Rect{0, lineHeight, s.width, s.height - lineHeight*2})
 	s.fifteen.Setup()
 	s.sprites = append(s.sprites, s.fifteen)
-	s.mines = mines.NewMinesBoard(8, 8, 12, s.renderer, sdl.Rect{0, lineHeight, s.width, s.height - lineHeight*2})
+	s.mines = mines.NewMinesBoard(
+		8, 8, 12,
+		s.renderer,
+		sdl.Rect{0, lineHeight, s.width, s.height - lineHeight*2})
 	s.mines.Setup()
 	s.sprites = append(s.sprites, s.mines)
 }

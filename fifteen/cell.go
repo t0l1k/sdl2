@@ -4,26 +4,26 @@ import (
 	"strconv"
 )
 
-type Cell struct {
+type cell struct {
 	number int
 }
 
-func NewCell(number int) *Cell {
-	return &Cell{
+func newCell(number int) *cell {
+	return &cell{
 		number: number,
 	}
 }
 
-func (s *Cell) GetNumber() int {
+func (s *cell) getNumber() int {
 	return s.number
 }
 
-func (s *Cell) IsBlank() bool {
+func (s *cell) isBlank() bool {
 	return s.number == 0
 }
 
-func (s *Cell) String() (str string) {
-	if s.IsBlank() {
+func (s *cell) String() (str string) {
+	if s.isBlank() {
 		str = "*"
 	} else {
 		str = strconv.Itoa(int(s.number))

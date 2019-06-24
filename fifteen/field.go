@@ -5,81 +5,81 @@ import (
 )
 
 const (
-	UP = iota
-	DOWN
-	LEFT
-	RIGHT
+	up = iota
+	down
+	left
+	right
 )
 
 type point struct {
 	x, y int
 }
 
-type Field struct {
+type field struct {
 	size  int
-	board []*Cell
+	board []*cell
 	blank point
 }
 
-func NewField(size int) *Field {
+func newField(size int) *field {
 	var (
-		board []*Cell
+		board []*cell
 		blank point
 	)
 	for i := 0; i < size*size; i++ {
 		if i >= size*size-1 {
-			board = append(board, NewCell(0))
+			board = append(board, newCell(0))
 			blank = point{i % size, i / size}
 		} else {
-			board = append(board, NewCell(i+1))
+			board = append(board, newCell(i+1))
 		}
 	}
-	return &Field{
+	return &field{
 		size:  size,
 		board: board,
 		blank: blank,
 	}
 }
 
-func (s *Field) GetBoard() []*Cell {
+func (s *field) getBoard() []*cell {
 	return s.board
 }
 
-func (s *Field) Win() bool {
+func (s *field) win() bool {
 	i := 0
 	for _, cell := range s.board {
-		if cell.GetNumber() == i+1 {
+		if cell.getNumber() == i+1 {
 			i++
-		} else if cell.GetNumber() != i+1 && cell.GetNumber() != 0 {
+		} else if cell.getNumber() != i+1 && cell.getNumber() != 0 {
 			return false
 		}
 	}
-	if s.board[i].GetNumber() == 0 && i == len(s.board)-1 {
+	if s.board[i].getNumber() == 0 && i == len(s.board)-1 {
 		return true
 	}
 	return false
 }
 
-func (s *Field) Shuffle(count int) {
+func (s *field) shuffle(count int) {
 	for i := 0; i < count; i++ {
 		direction := rand.Intn(4)
 		s.move(direction)
 	}
 }
 
-func (s *Field) Move(idx int) bool {
+func (s *field) moves(idx int) bool {
 	x, y := s.getPos(idx)
 	if s.blank.x == x {
 		if s.blank.y > y {
 			i := s.blank.y
 			for s.blank.y <= i && y != i {
-				s.move(UP)
+				s.move(up)
 				i--
 			}
 		} else if s.blank.y < y {
 			i := s.blank.y
 			for s.blank.y >= i && y != i {
-				s.move(DOWN)
+				s.move(down)
 				i++
 			}
 		}
@@ -88,13 +88,13 @@ func (s *Field) Move(idx int) bool {
 		if s.blank.x > x {
 			i := s.blank.x
 			for s.blank.x <= i && x != i {
-				s.move(LEFT)
+				s.move(left)
 				i--
 			}
 		} else if s.blank.x < x {
 			i := s.blank.x
 			for s.blank.x >= i && x != i {
-				s.move(RIGHT)
+				s.move(right)
 				i++
 			}
 		}
@@ -103,25 +103,25 @@ func (s *Field) Move(idx int) bool {
 	return false
 }
 
-func (s *Field) move(direction int) {
+func (s *field) move(direction int) {
 	x, y := s.blank.x, s.blank.y
 	switch direction {
-	case UP:
+	case up:
 		y--
 		if s.isEdge(x, y) {
 			y++
 		}
-	case DOWN:
+	case down:
 		y++
 		if s.isEdge(x, y) {
 			y--
 		}
-	case LEFT:
+	case left:
 		x--
 		if s.isEdge(x, y) {
 			x++
 		}
-	case RIGHT:
+	case right:
 		x++
 		if s.isEdge(x, y) {
 			x--
@@ -131,26 +131,26 @@ func (s *Field) move(direction int) {
 
 }
 
-func (s *Field) swap(a, b point) {
+func (s *field) swap(a, b point) {
 	tmp := s.board[s.getIdx(a.x, a.y)]
 	s.board[s.getIdx(a.x, a.y)] = s.board[s.getIdx(b.x, b.y)]
 	s.board[s.getIdx(b.x, b.y)] = tmp
 	s.blank = point{b.x, b.y}
 }
 
-func (s Field) isEdge(x, y int) bool {
+func (s field) isEdge(x, y int) bool {
 	return !(x >= 0 && x < s.size && y >= 0 && y < s.size)
 }
 
-func (s Field) getIdx(x, y int) int {
+func (s field) getIdx(x, y int) int {
 	return y*s.size + x
 }
 
-func (s Field) getPos(idx int) (int, int) {
+func (s field) getPos(idx int) (int, int) {
 	return idx % s.size, idx / s.size
 }
 
-func (s Field) String() string {
+func (s field) String() string {
 	str := ""
 	for y := 0; y < s.size; y++ {
 		for x := 0; x < s.size; x++ {

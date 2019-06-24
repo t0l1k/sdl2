@@ -14,7 +14,7 @@ type Game struct {
 	dim        int
 	sprites    []ui.Sprite
 	fg, bg     sdl.Color
-	field      *Field
+	field      *field
 	messageBox *ui.MessageBox
 	show       bool
 }
@@ -47,15 +47,15 @@ func (s *Game) Setup() {
 	if err != nil {
 		panic(err)
 	}
-	s.field = NewField(s.dim)
+	s.field = newField(s.dim)
 	marginX := (s.rect.W - cellSize*int32(s.dim)) / 2
 	marginY := (s.rect.H - cellSize*int32(s.dim)) / 2
-	for i, value := range s.field.GetBoard() {
+	for i, value := range s.field.getBoard() {
 		var x, y int32
 		x = s.rect.X + cellSize*int32(i%s.dim) + marginX
 		y = s.rect.Y + cellSize*int32(i/s.dim) + marginY
-		if value.GetNumber() > 0 {
-			bnt := ui.NewButton(s.renderer, strconv.Itoa(value.GetNumber()), sdl.Rect{x, y, cellSize, cellSize}, s.fg, s.bg, font, s.checkBtn)
+		if value.getNumber() > 0 {
+			bnt := ui.NewButton(s.renderer, strconv.Itoa(value.getNumber()), sdl.Rect{x, y, cellSize, cellSize}, s.fg, s.bg, font, s.checkBtn)
 			s.sprites = append(s.sprites, bnt)
 		} else {
 			bnt := ui.NewButton(s.renderer, " ", sdl.Rect{x, y, cellSize, cellSize}, s.bg, s.bg, font, s.checkBtn)
@@ -69,20 +69,20 @@ func (s *Game) Setup() {
 func (s *Game) checkBtn() {
 	for i, sprite := range s.sprites {
 		if sprite.(*ui.Button).IsPressed() {
-			s.field.Move(i)
-			for i, value := range s.field.GetBoard() {
+			s.field.moves(i)
+			for i, value := range s.field.getBoard() {
 				switch s.sprites[i].(type) {
 				case *ui.Button:
-					if value.GetNumber() > 0 {
+					if value.getNumber() > 0 {
 						s.sprites[i].(*ui.Button).SetFGBG(s.fg, s.bg)
-						s.sprites[i].(*ui.Button).SetText(strconv.Itoa(value.GetNumber()))
+						s.sprites[i].(*ui.Button).SetText(strconv.Itoa(value.getNumber()))
 					} else {
 						s.sprites[i].(*ui.Button).SetFGBG(s.bg, s.bg)
 						s.sprites[i].(*ui.Button).SetText(" ")
 					}
 				}
 			}
-			if s.field.Win() {
+			if s.field.win() {
 				s.messageBox.SetMessage("Board Solved")
 				s.messageBox.SetShow(true)
 			}
@@ -91,13 +91,13 @@ func (s *Game) checkBtn() {
 }
 
 func (s *Game) reset() {
-	s.field.Shuffle(100)
-	for i, value := range s.field.GetBoard() {
+	s.field.shuffle(100)
+	for i, value := range s.field.getBoard() {
 		switch s.sprites[i].(type) {
 		case *ui.Button:
-			if value.GetNumber() > 0 {
+			if value.getNumber() > 0 {
 				s.sprites[i].(*ui.Button).SetFGBG(s.fg, s.bg)
-				s.sprites[i].(*ui.Button).SetText(strconv.Itoa(value.GetNumber()))
+				s.sprites[i].(*ui.Button).SetText(strconv.Itoa(value.getNumber()))
 			} else {
 				s.sprites[i].(*ui.Button).SetFGBG(s.bg, s.bg)
 				s.sprites[i].(*ui.Button).SetText(" ")

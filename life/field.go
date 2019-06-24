@@ -5,52 +5,52 @@ import (
 	"strconv"
 )
 
-type Point struct {
-	X, Y int
+type point struct {
+	x, y int
 }
 
-type Field struct {
-	board []*Cell
+type field struct {
+	board []*cell
 	dim   int
 }
 
-func NewField(dim int) *Field {
-	var board []*Cell
+func newField(dim int) *field {
+	var board []*cell
 	for i := 0; i < dim*dim; i++ {
-		cell := NewCell()
+		cell := newCell()
 		board = append(board, cell)
 	}
-	return &Field{
+	return &field{
 		dim:   dim,
 		board: board,
 	}
 }
 
-func (s *Field) Shuffle() {
+func (s *field) shuffle() {
 	for i := 0; i < int(float64(s.dim*s.dim)*0.6); i++ {
 		for {
 			x, y := rand.Intn(s.dim), rand.Intn(s.dim)
-			if s.GetCellStatus(s.GetIdx(x, y)) == blank {
-				s.SetCellAlive(s.GetIdx(x, y))
+			if s.getCellStatus(s.getIdx(x, y)) == blank {
+				s.setCellAlive(s.getIdx(x, y))
 				break
 			}
 		}
 	}
 }
 
-func (s *Field) Turn() {
-	var board []CellStatus
+func (s *field) turn() {
+	var board []cellStatus
 	for idx := range s.board {
-		pos := s.GetPos(int(idx))
-		count := s.CountNeighbours(pos.X, pos.Y)
+		pos := s.getPos(int(idx))
+		count := s.countNeighbours(pos.x, pos.y)
 		// fmt.Println(idx, cell, pos, count)
-		if count == 3 && s.IsCellBlank(idx) {
+		if count == 3 && s.isCellBlank(idx) {
 			board = append(board, born)
 			// log.Println("ячека жива вокруг 3 соседа", pos, count, cell)
-		} else if count < 2 && s.IsCellAlive(idx) || count > 3 && s.IsCellAlive(idx) {
+		} else if count < 2 && s.isCellAlive(idx) || count > 3 && s.isCellAlive(idx) {
 			board = append(board, die)
 			// log.Println("вокруг ячейки меньше двух соседей, умираем от одиночества или больше трех соседей, умираем от тесноты", pos, count, cell)
-		} else if s.IsCellAlive(idx) {
+		} else if s.isCellAlive(idx) {
 			board = append(board, alive)
 		} else {
 			board = append(board, blank)
@@ -58,78 +58,78 @@ func (s *Field) Turn() {
 	}
 	for idx := range board {
 		if board[idx] == born {
-			s.board[idx].SetAlive()
+			s.board[idx].setAlive()
 		} else if board[idx] == die {
-			s.board[idx].SetBlank()
+			s.board[idx].setBlank()
 		} else if board[idx] == alive {
-			s.board[idx].SetAlive()
+			s.board[idx].setAlive()
 		}
 	}
 }
 
-func (s *Field) GetBoard() []*Cell {
+func (s *field) getBoard() []*cell {
 	return s.board
 }
 
-func (s *Field) GetCellStatus(idx int) CellStatus {
-	return s.board[idx].GetStatus()
+func (s *field) getCellStatus(idx int) cellStatus {
+	return s.board[idx].getStatus()
 }
 
-func (s *Field) IsCellBlank(idx int) bool {
-	return s.board[idx].GetStatus() == blank
+func (s *field) isCellBlank(idx int) bool {
+	return s.board[idx].getStatus() == blank
 }
 
-func (s *Field) IsCellAlive(idx int) bool {
-	return s.board[idx].GetStatus() == alive
+func (s *field) isCellAlive(idx int) bool {
+	return s.board[idx].getStatus() == alive
 }
 
-func (s *Field) IsCellBorn(idx int) bool {
-	return s.board[idx].GetStatus() == born
+func (s *field) isCellBorn(idx int) bool {
+	return s.board[idx].getStatus() == born
 }
 
-func (s *Field) IsCellDie(idx int) bool {
-	return s.board[idx].GetStatus() == die
+func (s *field) isCellDie(idx int) bool {
+	return s.board[idx].getStatus() == die
 }
 
-func (s *Field) SetCellAlive(idx int) {
-	s.board[idx].SetAlive()
+func (s *field) setCellAlive(idx int) {
+	s.board[idx].setAlive()
 }
 
-func (s *Field) SetCellBlank(idx int) {
-	s.board[idx].SetBlank()
+func (s *field) setCellBlank(idx int) {
+	s.board[idx].setBlank()
 }
 
-func (s *Field) SetCellBorn(idx int) {
-	s.board[idx].SetBorn()
+func (s *field) setCellBorn(idx int) {
+	s.board[idx].setBorn()
 }
 
-func (s *Field) SetCellDie(idx int) {
-	s.board[idx].SetDie()
+func (s *field) setCellDie(idx int) {
+	s.board[idx].setDie()
 }
 
-func (s *Field) IsEdge(x, y int) bool {
+func (s *field) isEdge(x, y int) bool {
 	return !(x >= 0 && x < s.dim && y >= 0 && y < s.dim)
 }
 
-func (s *Field) CountNeighbours(x0, y0 int) (count int) {
-	arr := s.GetNeighbour(x0, y0)
+func (s *field) countNeighbours(x0, y0 int) (count int) {
+	arr := s.getNeighbour(x0, y0)
 	for _, cell := range arr {
-		if cell.GetStatus() == alive {
+		if cell.getStatus() == alive {
 			count++
 		}
 	}
 	return count
 }
 
-func (s *Field) GetNeighbour(x0, y0 int) (neighbour []*Cell) {
-	if !s.IsEdge(x0, y0) {
+func (s *field) getNeighbour(x0, y0 int) (neighbour []*cell) {
+	if !s.isEdge(x0, y0) {
 		for y := int(-1); y < 2; y++ {
 			for x := int(-1); x < 2; x++ {
 				var nx, ny int
 				nx = x0 + x
 				ny = y0 + y
 				if nx >= 0 && nx < s.dim && ny >= 0 && ny < s.dim && !(x == 0 && y == 0) {
-					nCell := s.board[s.GetIdx(nx, ny)]
+					nCell := s.board[s.getIdx(nx, ny)]
 					neighbour = append(neighbour, nCell)
 				}
 			}
@@ -138,17 +138,17 @@ func (s *Field) GetNeighbour(x0, y0 int) (neighbour []*Cell) {
 	return neighbour
 }
 
-func (s *Field) GetPos(idx int) Point {
+func (s *field) getPos(idx int) point {
 	x, y := idx%s.dim, idx/s.dim
-	return Point{x, y}
+	return point{x, y}
 }
 
-func (s *Field) GetIdx(x, y int) int {
+func (s *field) getIdx(x, y int) int {
 	return y*s.dim + x
 }
 
-func (s *Field) String() string {
-	str := "Field:" + strconv.Itoa(int(s.dim)) + "\n"
+func (s *field) String() string {
+	str := "field:" + strconv.Itoa(int(s.dim)) + "\n"
 	for i, cell := range s.board {
 		if i%int(s.dim) == 0 && i > 0 {
 			str += "|\n-"

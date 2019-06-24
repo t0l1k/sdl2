@@ -159,10 +159,6 @@ func (s *MinesBoard) checkGameLogic() {
 	}
 }
 
-func (s *MinesBoard) GetShow() bool {
-	return s.show
-}
-
 func (s *MinesBoard) SetShow(show bool) {
 	s.show = show
 }
