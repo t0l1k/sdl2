@@ -1,7 +1,6 @@
 package mines
 
 import (
-	"fmt"
 	"math/rand"
 	"strconv"
 	"time"
@@ -141,7 +140,6 @@ func (s *minesField) isWin() bool {
 				s.field[idx].setState(saved)
 			}
 		}
-		fmt.Println("game win!!!")
 		return true
 	}
 	return false
@@ -160,7 +158,6 @@ func (s *minesField) isGameOver() bool {
 	} else {
 		return false
 	}
-	fmt.Println("game over")
 	return true
 }
 

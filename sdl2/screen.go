@@ -171,16 +171,16 @@ func (s *Screen) Event() {
 			s.width, s.height = t.Data1, t.Data2
 			s.Destroy()
 			s.setup()
-			fmt.Println("window resized", s.width, s.height)
+			// fmt.Println("window resized", s.width, s.height)
 		case sdl.WINDOWEVENT_FOCUS_GAINED:
-			fmt.Println("window focus gained", s.width, s.height)
+			// fmt.Println("window focus gained", s.width, s.height)
 		case sdl.WINDOWEVENT_FOCUS_LOST:
-			fmt.Println("window focus lost", s.width, s.height)
+			// fmt.Println("window focus lost", s.width, s.height)
 		case sdl.WINDOW_MINIMIZED:
-			fmt.Println("window minimized", s.width, s.height)
+			// fmt.Println("window minimized", s.width, s.height)
 			s.Destroy()
 		case sdl.WINDOWEVENT_RESTORED:
-			fmt.Println("window restored", s.width, s.height)
+			// fmt.Println("window restored", s.width, s.height)
 			s.setup()
 		}
 	}

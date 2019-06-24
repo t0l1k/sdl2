@@ -1,8 +1,6 @@
 package ui
 
 import (
-	"fmt"
-
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
 )
@@ -28,7 +26,6 @@ func NewMessageBox(title, message string, rect sdl.Rect, fg, bg sdl.Color, rende
 	w, h := int32(float64(wFont)*1.3), int32(float64(hFont)*5)
 	x, y := rect.X+(rect.W-w)/2, rect.Y+(rect.H-h)/2
 	rect = sdl.Rect{x, y, w, h}
-	fmt.Println(rect)
 	texture := newMessageBoxTexture(title, message, rect, sdl.Color{255, 0, 0, 255}, sdl.Color{0, 128, 0, 255}, renderer, font)
 	btnOk := NewButton(renderer, "OK", sdl.Rect{x + (w-w/2)/2, y + (h - h/5), w / 2, h / 5}, fg, bg, font, fnOk)
 	return &MessageBox{
@@ -56,9 +53,9 @@ func newMessageBoxTexture(title, message string, rect sdl.Rect, fg, bg sdl.Color
 		panic(err)
 	}
 	renderer.SetRenderTarget(texture)
-	setColor(renderer, bg)
+	SetColor(renderer, bg)
 	renderer.Clear()
-	setColor(renderer, fg)
+	SetColor(renderer, fg)
 	renderer.DrawRect(&sdl.Rect{0, 0, rect.W, rect.H})
 	_, hFont, _ := font.SizeUTF8(title)
 	renderer.DrawRect(&sdl.Rect{0, 0, rect.W, int32(hFont) + 3})

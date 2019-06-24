@@ -158,7 +158,7 @@ func (s *Field) String() string {
 			str += "\n"
 		}
 		str += "|"
-		str += cell.Print()
+		str += cell.String()
 	}
 	str += "|\n"
 	return str

@@ -1,7 +1,6 @@
 package mines
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -35,7 +34,6 @@ func (s *gameConfig) stop() {
 func (s *gameConfig) getStopper() int {
 	if s.end.After(s.begin) {
 		s.timer = s.end.Sub(s.begin)
-		fmt.Println("set endper")
 	} else {
 		s.timer = time.Now().Sub(s.begin)
 	}

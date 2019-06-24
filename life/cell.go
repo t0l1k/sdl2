@@ -1,7 +1,5 @@
 package life
 
-import "fmt"
-
 type CellStatus byte
 
 const (
@@ -40,10 +38,6 @@ func (s *Cell) SetDie() {
 }
 
 func (s Cell) String() string {
-	return fmt.Sprintf("Cell:%v", s.status)
-}
-
-func (s Cell) Print() string {
 	str := " "
 	switch s.status {
 	case alive:

@@ -1,8 +1,7 @@
 package mines
 
 import (
-	"sdl/mines/sdl2/ui"
-
+	"github.com/t0l1k/sdl2/sdl2/ui"
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
 )

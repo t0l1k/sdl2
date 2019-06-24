@@ -1,8 +1,6 @@
 package ui
 
 import (
-	"fmt"
-
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
 )
@@ -173,9 +171,9 @@ func (s *Button) Update() {
 				s.leftButton = false
 			}
 		case 2:
-			fmt.Println("pressed 2")
+			// fmt.Println("pressed 2")
 		case 3:
-			fmt.Println("pressed 3")
+			// fmt.Println("pressed 3")
 		case 4:
 			if s.focus {
 				s.pressed = true

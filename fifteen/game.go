@@ -1,7 +1,6 @@
 package fifteen
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/t0l1k/sdl2/sdl2/ui"
@@ -84,7 +83,6 @@ func (s *Game) checkBtn() {
 				}
 			}
 			if s.field.Win() {
-				fmt.Println("Board Solved")
 				s.messageBox.SetMessage("Board Solved")
 				s.messageBox.SetShow(true)
 			}

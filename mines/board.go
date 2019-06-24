@@ -2,9 +2,9 @@ package mines
 
 import (
 	"fmt"
-	"sdl/mines/sdl2/ui"
 	"strconv"
 
+	"github.com/t0l1k/sdl2/sdl2/ui"
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
 )
@@ -127,7 +127,6 @@ func (s *MinesBoard) checkGameLogic() {
 					s.lastTime = sdl.GetTicks()
 					s.field.open(x, y)
 				}
-				fmt.Println("game start...")
 			case gamePlay:
 				if button.IsPressedLeft() {
 					if cell.getState() == closed {
@@ -136,7 +135,6 @@ func (s *MinesBoard) checkGameLogic() {
 						s.field.autoMarkFlags(x, y)
 					}
 					if s.field.isWin() || s.field.isGameOver() {
-						fmt.Println("stop game")
 						s.gameConfig.stop()
 						if s.field.isWin() {
 							s.message.SetMessage("Board Solved")
@@ -153,11 +151,8 @@ func (s *MinesBoard) checkGameLogic() {
 					s.field.markFlag(x, y)
 				}
 			case gamePause:
-				fmt.Println("game pause...")
 			case gameWin:
-				fmt.Println("game win...")
 			case gameOver:
-				fmt.Println("game over...")
 			}
 			s.paint()
 		}
