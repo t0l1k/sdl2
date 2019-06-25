@@ -22,6 +22,7 @@ const (
 
 type minesField struct {
 	field              []*cell
+	savedField         []cellState
 	state              gameState
 	row, column, mines int
 	firstMove          point
@@ -166,6 +167,22 @@ func (s *minesField) isGameOver() bool {
 		return false
 	}
 	return true
+}
+
+func (s *minesField) saveLastMove() {
+	s.savedField = s.savedField[:0]
+	for idx := range s.field {
+		s.savedField = append(s.savedField, s.field[idx].getState())
+	}
+}
+
+func (s *minesField) restoreLastMove() {
+	for idx := range s.field {
+		s.field[idx].setState(s.savedField[idx])
+	}
+	if s.state == gameOver || s.state == gameWin {
+		s.state = gamePlay
+	}
 }
 
 func (s *minesField) reset() {

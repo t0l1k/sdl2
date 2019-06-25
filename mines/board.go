@@ -98,6 +98,12 @@ func (s *MinesBoard) reset() {
 	s.paint()
 }
 
+func (s *MinesBoard) restoreLastMove() {
+	s.field.restoreLastMove()
+	s.message.SetShow(false)
+	s.paint()
+}
+
 func (s *MinesBoard) paint() {
 	for idx, sprite := range s.sprites {
 		switch sprite.(type) {
@@ -130,6 +136,7 @@ func (s *MinesBoard) checkGameLogic() {
 				}
 			case gamePlay:
 				if button.IsPressedLeft() {
+					s.field.saveLastMove()
 					if cell.getState() == closed {
 						s.field.open(x, y)
 					} else if cell.getState() == opened {
@@ -205,6 +212,8 @@ func (s *MinesBoard) Event(event sdl.Event) {
 			} else if t.Keysym.Sym == sdl.K_3 && t.State == sdl.RELEASED {
 				s.gameConfig.setGameData(30, 16, 99)
 				s.newGame()
+			} else if t.Keysym.Sym == sdl.K_BACKSPACE && t.State == sdl.RELEASED {
+				s.restoreLastMove()
 			}
 		}
 		for _, sprite := range s.sprites {
