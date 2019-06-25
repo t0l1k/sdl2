@@ -6,6 +6,10 @@ import (
 	"time"
 )
 
+type point struct {
+	x, y int
+}
+
 type gameState string
 
 const (
@@ -20,6 +24,7 @@ type minesField struct {
 	field              []*cell
 	state              gameState
 	row, column, mines int
+	firstMove          point
 }
 
 func newMinesField(row, column, mines int) *minesField {
@@ -97,6 +102,8 @@ func (s *minesField) markFlag(x, y int) {
 
 func (s *minesField) shuffle(fX, fY int) {
 	if s.state == gameStart {
+		s.firstMove.x = fX
+		s.firstMove.y = fY
 		rand.Seed(time.Now().UTC().UnixNano())
 		var mines int
 		for mines < s.mines {
@@ -166,6 +173,7 @@ func (s *minesField) reset() {
 		s.field[idx].reset()
 	}
 	s.state = gameStart
+	s.open(s.firstMove.x, s.firstMove.y)
 }
 
 func (s *minesField) isFieldEdge(x, y int) bool {

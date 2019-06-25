@@ -24,8 +24,8 @@ type MinesBoard struct {
 	fnMessage  func()
 }
 
-func NewMinesBoard(row, column, mines int, renderer *sdl.Renderer, rect sdl.Rect) *MinesBoard {
-	gameConfig := newGameConfig(row, column, mines)
+func NewMinesBoard(renderer *sdl.Renderer, rect sdl.Rect) *MinesBoard {
+	gameConfig := newGameConfig(8, 8, 12)
 	fg, bg := sdl.Color{0, 0, 0, 255}, sdl.Color{96, 192, 32, 255}
 	return &MinesBoard{
 		gameConfig: gameConfig,
@@ -61,7 +61,7 @@ func (s *MinesBoard) Setup() {
 		btn := ui.NewButton(s.renderer, cell.String(), sdl.Rect{x, y, cellSize, cellSize}, s.fg, s.bg, s.font, s.checkGameLogic)
 		s.sprites = append(s.sprites, btn)
 	}
-	s.status = newStatusLine(sdl.Rect{s.rect.X, s.rect.Y + cellSize*int32(s.gameConfig.column), s.rect.W, int32(cellSize)}, s.fg, s.bg, s.renderer, s.font)
+	s.status = newStatusLine(sdl.Rect{s.rect.X + cellSize, s.rect.Y + marginY + cellSize*int32(s.gameConfig.column), s.rect.W, int32(cellSize)}, s.fg, s.bg, s.renderer, s.font)
 	s.fnMessage = s.newGame
 	s.message = ui.NewMessageBox("Minesweeper", "test message", s.rect, s.fg, s.bg, s.renderer, s.fnMessage)
 	s.SetShow(false)
@@ -83,8 +83,9 @@ func (s *MinesBoard) calcCellSize() (cellSize int32) {
 }
 
 func (s *MinesBoard) newGame() {
-	s.field.destroy()
-	s.field = newMinesField(s.gameConfig.row, s.gameConfig.column, s.gameConfig.mines)
+	s.Destroy()
+	s.Setup()
+	s.SetShow(true)
 	s.gameConfig.stop()
 	s.message.SetShow(false)
 	s.paint()
@@ -194,6 +195,15 @@ func (s *MinesBoard) Event(event sdl.Event) {
 			if t.Keysym.Sym == sdl.K_SPACE && t.State == sdl.RELEASED {
 				s.reset()
 			} else if t.Keysym.Sym == sdl.K_RETURN && t.State == sdl.RELEASED {
+				s.newGame()
+			} else if t.Keysym.Sym == sdl.K_1 && t.State == sdl.RELEASED {
+				s.gameConfig.setGameData(8, 8, 12)
+				s.newGame()
+			} else if t.Keysym.Sym == sdl.K_2 && t.State == sdl.RELEASED {
+				s.gameConfig.setGameData(16, 16, 40)
+				s.newGame()
+			} else if t.Keysym.Sym == sdl.K_3 && t.State == sdl.RELEASED {
+				s.gameConfig.setGameData(30, 16, 99)
 				s.newGame()
 			}
 		}

@@ -95,7 +95,6 @@ func (s *Screen) setup() {
 	s.fifteen.Setup()
 	s.sprites = append(s.sprites, s.fifteen)
 	s.mines = mines.NewMinesBoard(
-		8, 8, 12,
 		s.renderer,
 		sdl.Rect{0, lineHeight, s.width, s.height - lineHeight*2})
 	s.mines.Setup()

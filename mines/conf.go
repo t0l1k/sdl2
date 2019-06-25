@@ -23,6 +23,12 @@ func (s *gameConfig) getGameData() (int, int, int) {
 	return s.row, s.column, s.mines
 }
 
+func (s *gameConfig) setGameData(row, column, mines int) {
+	s.row = row
+	s.column = column
+	s.mines = mines
+}
+
 func (s *gameConfig) start() {
 	s.begin = time.Now()
 }
