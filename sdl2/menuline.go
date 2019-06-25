@@ -41,7 +41,7 @@ func NewMenuLine(title string, rect sdl.Rect, fg, bg sdl.Color, renderer *sdl.Re
 }
 
 func (s *MenuLine) Render(renderer *sdl.Renderer) {
-	setColor(renderer, s.bg)
+	ui.SetColor(renderer, s.bg)
 	renderer.FillRect(&s.rect)
 	for _, sprite := range s.sprites {
 		sprite.Render(s.renderer)

@@ -208,7 +208,7 @@ func (s *Screen) Update() {
 }
 
 func (s *Screen) Render() {
-	setColor(s.renderer, s.bg)
+	ui.SetColor(s.renderer, s.bg)
 	s.renderer.Clear()
 	for _, sprite := range s.sprites {
 		sprite.Render(s.renderer)
@@ -257,8 +257,4 @@ func (s *Screen) Destroy() {
 
 func (s *Screen) quit() {
 	s.running = false
-}
-
-func setColor(renderer *sdl.Renderer, color sdl.Color) {
-	renderer.SetDrawColor(color.R, color.G, color.B, color.A)
 }
