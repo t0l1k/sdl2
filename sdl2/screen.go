@@ -3,14 +3,9 @@ package sdl2
 import (
 	"fmt"
 
-	"github.com/t0l1k/sdl2/clock"
-	"github.com/t0l1k/sdl2/fifteen"
-	"github.com/t0l1k/sdl2/life"
-	"github.com/t0l1k/sdl2/mines"
 	"github.com/t0l1k/sdl2/sdl2/ui"
 
 	"github.com/veandco/go-sdl2/sdl"
-	"github.com/veandco/go-sdl2/ttf"
 )
 
 type Screen struct {
@@ -20,17 +15,9 @@ type Screen struct {
 	width, height          int32
 	flags                  uint32
 	running                bool
-	bg, fg, lineBg         sdl.Color
 	fpsCountTime, fpsCount uint32
 	sprites                []ui.Sprite
-	font                   *ttf.Font
-	menuLine               *MenuLine
-	statusLine             *StatusLine
-	analogClock            *clock.AnalogClock
-	life                   *life.Life
-	fifteen                *fifteen.Game
-	mines                  *mines.MinesBoard
-	fnAnalog               clock.GetTime
+	appManager             *AppManager
 }
 
 func NewScreen(title string, window *sdl.Window, renderer *sdl.Renderer, width, height int32) *Screen {
@@ -40,106 +27,13 @@ func NewScreen(title string, window *sdl.Window, renderer *sdl.Renderer, width, 
 		renderer: renderer,
 		width:    width,
 		height:   height,
-		bg:       sdl.Color{192, 192, 192, 0},
-		fg:       sdl.Color{0, 0, 0, 255},
-		lineBg:   sdl.Color{128, 128, 128, 0},
-		fnAnalog: clock.Get,
 	}
 }
 
 func (s *Screen) setup() {
-	var err error
-	fontSize := int(float64(s.height) * 0.03) // Главная константа перерисовки экрана
-	s.font, err = ttf.OpenFont("assets/Roboto-Regular.ttf", fontSize)
-	if err != nil {
-		panic(err)
-	}
-	lineHeight := int32(float64(fontSize) * 1.5)
-	s.menuLine = NewMenuLine(
-		s.title,
-		sdl.Rect{0, 0, s.width, lineHeight},
-		s.fg,
-		s.lineBg,
-		s.renderer,
-		s.font,
-		func() { s.quit() })
-	s.sprites = append(s.sprites, s.menuLine)
-	s.statusLine = NewStatusLine(
-		sdl.Rect{0, s.height - lineHeight, s.width, lineHeight},
-		s.fg,
-		s.lineBg,
-		s.renderer,
-		s.font,
-		s.selectClock,
-		s.selectLife,
-		s.selectFifteen,
-		s.selectMines)
-	s.sprites = append(s.sprites, s.statusLine)
-	s.analogClock = clock.NewAnalogClock(
-		s.renderer,
-		sdl.Rect{0, lineHeight, s.width, s.height - lineHeight*2},
-		s.fg,
-		sdl.Color{255, 0, 0, 255},
-		s.bg, s.bg,
-		s.fnAnalog)
-	s.sprites = append(s.sprites, s.analogClock)
-	s.life = life.NewLife(
-		128, 255,
-		s.renderer,
-		sdl.Rect{0, lineHeight, s.width, s.height - lineHeight*2},
-		s.fg, s.bg)
-	s.sprites = append(s.sprites, s.life)
-	s.fifteen = fifteen.NewGame(
-		s.renderer,
-		sdl.Rect{0, lineHeight, s.width, s.height - lineHeight*2})
-	s.fifteen.Setup()
-	s.sprites = append(s.sprites, s.fifteen)
-	s.mines = mines.NewMinesBoard(
-		s.renderer,
-		sdl.Rect{0, lineHeight, s.width, s.height - lineHeight*2})
-	s.mines.Setup()
-	s.sprites = append(s.sprites, s.mines)
-}
-
-func (s *Screen) selectMines() {
-	s.title = "Game Minesweeper"
-	s.Destroy()
-	s.setup()
-	s.analogClock.SetShow(false)
-	s.life.SetShow(false)
-	s.fifteen.SetShow(false)
-	s.mines.SetShow(true)
-}
-
-func (s *Screen) selectFifteen() {
-	s.title = "Game Fifteen"
-	s.Destroy()
-	s.setup()
-	s.analogClock.SetShow(false)
-	s.life.SetShow(false)
-	s.mines.SetShow(false)
-	s.fifteen.SetShow(true)
-}
-
-func (s *Screen) selectLife() {
-	s.title = "Conway's Life"
-	s.Destroy()
-	s.setup()
-	s.analogClock.SetShow(false)
-	s.fifteen.SetShow(false)
-	s.mines.SetShow(false)
-	s.life.SetShow(true)
-}
-
-func (s *Screen) selectClock() {
-	s.fnAnalog = clock.Get
-	s.title = "Clock"
-	s.Destroy()
-	s.setup()
-	s.life.SetShow(false)
-	s.fifteen.SetShow(false)
-	s.mines.SetShow(false)
-	s.analogClock.SetShow(true)
+	s.appManager = NewAppManager(s.renderer, s.title, s.width, s.height, s.quit)
+	s.appManager.setup()
+	s.sprites = append(s.sprites, s.appManager)
 }
 
 func (s *Screen) setMode() {
@@ -166,9 +60,6 @@ func (s *Screen) Event() {
 	case *sdl.QuitEvent:
 		s.quit()
 	case *sdl.KeyboardEvent:
-		if t.Keysym.Sym == sdl.K_ESCAPE && t.State == sdl.RELEASED {
-			s.quit()
-		}
 		if t.Keysym.Sym == sdl.K_F11 && t.State == sdl.RELEASED {
 			s.setMode()
 		}
@@ -208,7 +99,6 @@ func (s *Screen) Update() {
 }
 
 func (s *Screen) Render() {
-	ui.SetColor(s.renderer, s.bg)
 	s.renderer.Clear()
 	for _, sprite := range s.sprites {
 		sprite.Render(s.renderer)
@@ -252,7 +142,6 @@ func (s *Screen) Destroy() {
 		sprite.Destroy()
 	}
 	s.sprites = s.sprites[:0]
-	s.font.Close()
 }
 
 func (s *Screen) quit() {
