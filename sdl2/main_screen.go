@@ -6,6 +6,7 @@ import (
 	"github.com/t0l1k/sdl2/life"
 	"github.com/t0l1k/sdl2/mines"
 	"github.com/t0l1k/sdl2/sdl2/ui"
+	"github.com/t0l1k/sdl2/snake"
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
 )
@@ -24,13 +25,14 @@ type AppManager struct {
 	life           *life.Life
 	fifteen        *fifteen.Game
 	mines          *mines.MinesBoard
+	snake          *snake.Game
 	fnAnalog       clock.GetTime
 	fnQuit         func()
 }
 
 func NewAppManager(renderer *sdl.Renderer, title string, width, height int32, quit func()) *AppManager {
 	titles := make([]string, 0)
-	titles = append(titles, title, "Clock", "Conway's Life", "Game Fifteen", "Game Minesweeper")
+	titles = append(titles, title, "Clock", "Conway's Life", "Game Fifteen", "Game Minesweeper", "Game Snake")
 	return &AppManager{
 		screenIndex: 0,
 		title:       title,
@@ -86,11 +88,27 @@ func (s *AppManager) setup() {
 		sdl.Rect{0, lineHeight, s.rect.W, s.rect.H - lineHeight})
 	s.mines.Setup()
 	s.sprites = append(s.sprites, s.mines)
-	fnArr := []func(){s.selectClock, s.selectLife, s.selectFifteen, s.selectMines}
+	s.snake = snake.NewGame(s.renderer, sdl.Rect{0, lineHeight, s.rect.W, s.rect.H - lineHeight})
+	s.snake.Setup()
+	s.sprites = append(s.sprites, s.snake)
+	fnArr := []func(){s.selectClock, s.selectLife, s.selectFifteen, s.selectMines, s.selectSnake}
 	for i := 0; i < len(fnArr); i++ {
 		btn := ui.NewButton(s.renderer, s.titles[i+1], sdl.Rect{0, lineHeight + lineHeight*int32(i), lineHeight * 10, lineHeight}, s.fg, s.bg, s.font, fnArr[i])
 		s.sprites = append(s.sprites, btn)
 	}
+}
+
+func (s *AppManager) selectSnake() {
+	s.screenIndex = 5
+	s.title = s.titles[s.screenIndex]
+	s.Destroy()
+	s.setup()
+	s.analogClock.SetShow(false)
+	s.life.SetShow(false)
+	s.fifteen.SetShow(false)
+	s.mines.SetShow(false)
+	s.snake.SetShow(true)
+	s.sprites = s.sprites[:len(s.sprites)-len(s.titles)+1]
 }
 
 func (s *AppManager) selectMines() {
